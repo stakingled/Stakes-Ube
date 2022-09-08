@@ -45,7 +45,7 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 
     |
-    |  Stakes v.2
+    |  Stakes v.3
     |
     |----------------------------
     |
@@ -58,155 +58,6 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 */
 
 pragma solidity ^0.8.2;
-
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "SafeMath: addition overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return sub(a, b, "SafeMath: subtraction overflow");
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
-        uint256 c = a - b;
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-        // benefit is lost if 'b' is also tested.
-        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-        if (a == 0) {
-            return 0;
-        }
-
-        uint256 c = a * b;
-        require(c / a == b, "SafeMath: multiplication overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return div(a, b, "SafeMath: division by zero");
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        // Solidity only automatically asserts when dividing by 0
-        require(b > 0, errorMessage);
-        uint256 c = a / b;
-        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return mod(a, b, "SafeMath: modulo by zero");
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts with custom message when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b != 0, errorMessage);
-        return a % b;
-    }
-}
 
 /**
  * @title Owner
@@ -796,8 +647,6 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
  */
 contract Stakes is Owner, ReentrancyGuard {
 
-    using SafeMath for uint256;
-
     // token    
     ERC20 public asset;
 
@@ -812,7 +661,7 @@ contract Stakes is Owner, ReentrancyGuard {
     }
 
     // contract parameters
-    uint8 public interest_rate;
+    uint16 public interest_rate;
     uint256 public maturity;
     uint8 public penalization;
     uint256 public lower_amount;
@@ -822,7 +671,7 @@ contract Stakes is Owner, ReentrancyGuard {
     event StakeStart(address indexed user, uint256 value, uint256 index);
     event StakeEnd(address indexed user, uint256 value, uint256 penalty, uint256 interest, uint256 index);
     
-    constructor(ERC20 _erc20, address _owner, uint8 _rate, uint256 _maturity, uint8 _penalization, uint256 _lower) Owner(_owner) {
+    constructor(ERC20 _erc20, address _owner, uint16 _rate, uint256 _maturity, uint8 _penalization, uint256 _lower) Owner(_owner) {
         require(_penalization<=100, "Penalty has to be an integer between 0 and 100");
         asset = _erc20;
         interest_rate = _rate;
@@ -831,9 +680,9 @@ contract Stakes is Owner, ReentrancyGuard {
         lower_amount = _lower;
     }
     
-    function start(uint256 _value) external {
+    function start(uint256 _value) external nonReentrant {
         require(_value >= lower_amount, "Invalid value");
-        asset.transferFrom(msg.sender, address(this), _value);
+        require(asset.transferFrom(msg.sender, address(this), _value));
         ledger[msg.sender].push(Record(block.timestamp, _value, 0, 0, 0, false));
         emit StakeStart(msg.sender, _value, ledger[msg.sender].length-1);
     }
@@ -844,10 +693,10 @@ contract Stakes is Owner, ReentrancyGuard {
         require(ledger[msg.sender][i].ended==false, "Invalid stake");
         
         // penalization
-        if(block.timestamp.sub(ledger[msg.sender][i].from) < maturity) {
-            uint256 _penalization = ledger[msg.sender][i].amount.mul(penalization).div(100);
-            asset.transfer(msg.sender, ledger[msg.sender][i].amount.sub(_penalization));
-            asset.transfer(getOwner(), _penalization);
+        if(block.timestamp - ledger[msg.sender][i].from < maturity) {
+            uint256 _penalization = ledger[msg.sender][i].amount * penalization / 100;
+            require(asset.transfer(msg.sender, ledger[msg.sender][i].amount - _penalization));
+            require(asset.transfer(getOwner(), _penalization));
             ledger[msg.sender][i].penalization = _penalization;
             ledger[msg.sender][i].to = block.timestamp;
             ledger[msg.sender][i].ended = true;
@@ -857,11 +706,11 @@ contract Stakes is Owner, ReentrancyGuard {
             uint256 _interest = get_gains(msg.sender, i);
             // check that the owner can pay interest before trying to pay
             if (asset.allowance(getOwner(), address(this)) >= _interest && asset.balanceOf(getOwner()) >= _interest) {
-                asset.transferFrom(getOwner(), msg.sender, _interest);
+                require(asset.transferFrom(getOwner(), msg.sender, _interest));
             } else {
                 _interest = 0;
             }
-            asset.transfer(msg.sender, ledger[msg.sender][i].amount);
+            require(asset.transfer(msg.sender, ledger[msg.sender][i].amount));
             ledger[msg.sender][i].gain = _interest;
             ledger[msg.sender][i].to = block.timestamp;
             ledger[msg.sender][i].ended = true;
@@ -869,7 +718,7 @@ contract Stakes is Owner, ReentrancyGuard {
         }
     }
 
-    function set(uint256 _lower, uint256 _maturity, uint8 _rate, uint8 _penalization) public isOwner {
+    function set(uint256 _lower, uint256 _maturity, uint16 _rate, uint8 _penalization) external isOwner {
         require(_penalization<=100, "Invalid value");
         lower_amount = _lower;
         maturity = _maturity;
@@ -879,14 +728,12 @@ contract Stakes is Owner, ReentrancyGuard {
     
     // calculate interest to the current date time
     function get_gains(address _address, uint256 _rec_number) public view returns (uint256) {
-        uint256 _record_seconds = block.timestamp.sub(ledger[_address][_rec_number].from);
+        uint256 _record_seconds = block.timestamp - ledger[_address][_rec_number].from;
         uint256 _year_seconds = 365*24*60*60;
-        return _record_seconds.mul(
-            ledger[_address][_rec_number].amount.mul(interest_rate).div(100)
-        ).div(_year_seconds);
+        return _record_seconds * ledger[_address][_rec_number].amount * interest_rate / 100 / _year_seconds;
     }
 
-    function ledger_length(address _address) public view returns (uint256) {
+    function ledger_length(address _address) external view returns (uint256) {
         return ledger[_address].length;
     }
 
