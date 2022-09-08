@@ -21,6 +21,6 @@ Imagine a site owner who has a token for a particular project, the owner can cre
 
 Then the token holders can create Stakes, depositing an amount of tokens in the contract and accruing interest while the tokens are staked, once the Stake is finalized, the token holders will receive their original amount plus the interest earned. A penalty may be applied if stakes end before a predefined maturity period.
 
-Source: https://wpsmartcontracts.com/flavors/ube/
+Author: https://wpsmartcontracts.com/flavors/ube/
 
 
