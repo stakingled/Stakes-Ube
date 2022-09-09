@@ -6,7 +6,10 @@ Staking for Standard ERC-20 / BEP-20 tokens
 What is Ube Smart Contract?
 
 The Stakes Smart Contracts allow ERC-20 / BEP-20 token holders to be able to create a Stake and gain interest, based on a predefined APY.
+
+
 Features
+
 
 Administrator user can define the parameters of the contract:
 
