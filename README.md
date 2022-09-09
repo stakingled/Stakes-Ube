@@ -1,7 +1,6 @@
 Ube
 
-ERC-20 / BEP-20 Staking
-Staking for Standard ERC-20 / BEP-20 tokens
+ERC-20 / BEP-20 Staking for Standard ERC-20 / BEP-20 tokens
 
 What is Ube Smart Contract?
 
